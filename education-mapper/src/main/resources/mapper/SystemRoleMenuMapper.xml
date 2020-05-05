@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.education.mapper.system.SystemRoleMenuMapper">
+
+    <!-- 根据角色id  获取菜单列表 -->
+   <select id="getMenuListByRoleIds" resultType="map">
+       select * from menu where id in (
+         select menu_id from system_role_menu where role_id in 
+         <foreach collection="roleIds" separator="," close=")" open="(" item="id">
+             #{id}
+         </foreach>
+       )
+   </select>
+</mapper>
