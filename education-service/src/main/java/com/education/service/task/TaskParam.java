@@ -1,23 +1,25 @@
 package com.education.service.task;
 
+import java.util.HashMap;
+
 /**
  * 封装任务参数类
  * @author zengjintao
  * @version 1.0
  * @create_at 2020/4/13 14:46
  */
-public class TaskParam {
+public class TaskParam extends HashMap {
 
-    private String taskListenerBeanName;
+    private Class<? extends TaskListener> taskListenerClass;
     private final long timestamp;
     private Object data;
 
-    public String getTaskListenerBeanName() {
-        return taskListenerBeanName;
+    public Class<? extends TaskListener> getTaskListenerClass() {
+        return taskListenerClass;
     }
 
-    public void setTaskListenerBeanName(String taskListenerBeanName) {
-        this.taskListenerBeanName = taskListenerBeanName;
+    public void setTaskListenerClass(Class<? extends TaskListener> taskListenerClass) {
+        this.taskListenerClass = taskListenerClass;
     }
 
     public long getTimestamp() {
@@ -36,13 +38,17 @@ public class TaskParam {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public TaskParam(String taskListenerBeanName, long timestamp, Object data) {
+    public TaskParam(Class<? extends TaskListener> taskListenerClass, long timestamp, Object data) {
         this.timestamp = timestamp;
-        this.taskListenerBeanName = taskListenerBeanName;
+        this.taskListenerClass = taskListenerClass;
         this.data = data;
     }
 
-    public TaskParam(String taskListenerBeanName, Object data) {
-        this(taskListenerBeanName, System.currentTimeMillis(), data);
+    public TaskParam(Class<? extends TaskListener> taskListenerClass, Object data) {
+        this(taskListenerClass, System.currentTimeMillis(), data);
+    }
+
+    public TaskParam(Class<? extends TaskListener> taskListenerClass) {
+        this(taskListenerClass, System.currentTimeMillis(), null);
     }
 }

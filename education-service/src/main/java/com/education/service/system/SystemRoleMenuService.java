@@ -18,4 +18,13 @@ public class SystemRoleMenuService extends BaseService<SystemRoleMenuMapper> {
     public List<Map> getMenuListByRoleIds(Map params) {
         return mapper.getMenuListByRoleIds(params);
     }
+
+
+    public int deleteByRoleId(Integer roleId) {
+        return mapper.deleteByRoleId(roleId);
+    }
+
+    public int deleteByRoleIds(List<Integer> roleIds) {
+        return mapper.deleteByRoleIds(roleIds);
+    }
 }

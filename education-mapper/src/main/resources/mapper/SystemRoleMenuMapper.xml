@@ -11,4 +11,16 @@
          </foreach>
        )
    </select>
+
+    <delete id="deleteByRoleId" parameterType="Integer">
+       delete from system_role_menu where role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteByRoleIds" parameterType="list">
+        delete from system_role_menu where role_id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

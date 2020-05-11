@@ -103,4 +103,8 @@ public class SystemAdminService extends BaseService<SystemAdminMapper> {
         List<Map> treeMenuList = MapTreeUtils.buildTreeData(menuList);
         adminUserSession.setMenuList(treeMenuList);
     }
+
+    public int update(Map params) {
+        return mapper.update(params);
+    }
 }

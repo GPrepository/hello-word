@@ -13,4 +13,13 @@ import java.util.Map;
 public interface SystemAdminRoleMapper extends BaseMapper {
 
     List<Map> findRoleListByAdminId(Integer adminId);
+
+    int deleteByRoleId(Integer roleId);
+
+    /**
+     * 批量删除角色关联的菜单
+     * @param roleIds
+     * @return
+     */
+    int deleteByRoleIds(List<Integer> roleIds);
 }

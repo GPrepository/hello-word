@@ -24,7 +24,7 @@ public interface BaseMapper {
      * @param params
      * @return
      */
-    int update(Map params);
+    int update(@Param("params") Map params);
 
     /**
      * 批量添加
@@ -39,6 +39,20 @@ public interface BaseMapper {
      * @return
      */
     int batchUpdate(Map params);
+
+    /**
+     * 根据id 删除数据
+     * @param id
+     * @return
+     */
+    int deleteById(Integer id);
+
+    /**
+     * 根据id 集合批量删除数据
+     * @param ids
+     * @return
+     */
+    int batchDeleteByIds(List<Integer> ids);
 
     /**
      * 查询列表

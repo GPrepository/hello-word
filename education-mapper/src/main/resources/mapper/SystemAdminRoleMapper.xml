@@ -5,4 +5,15 @@
    <select id="findRoleListByAdminId" resultType="map">
       select * from system_admin_role where admin_id = #{adminId}
    </select>
+
+   <delete id="deleteByRoleId" parameterType="Integer">
+      delete from system_admin_role where role_id = #{roleId}
+   </delete>
+
+   <delete id="deleteByRoleIds" parameterType="list">
+      delete from system_admin_role where role_id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+         #{id}
+      </foreach>
+   </delete>
 </mapper>

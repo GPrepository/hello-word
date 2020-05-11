@@ -3,7 +3,17 @@
 <mapper namespace="com.education.mapper.system.SystemRoleMapper">
 
     <select id="queryList" resultType="map">
-        select * from system_admin
+        select * from system_role
+        <where>
+            <if test="name != null and name != ''">
+                <bind name="keyWord" value="'%' + name + '%'"/>
+                and name like #{keyWord}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByRoleName" resultType="map">
+        select * from system_role where name = #{name}limit 1
     </select>
 
     <insert id="save" parameterType="map">
@@ -16,4 +26,24 @@
             #{value}
         </foreach>
     </insert>
+
+
+    <update id="update" parameterType="map">
+        update system_role
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete from system_role where id = #{id}
+    </delete>
+
+    <delete id="deleteByRoleIds" parameterType="list">
+        delete from system_role where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

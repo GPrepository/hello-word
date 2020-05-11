@@ -13,4 +13,18 @@ import java.util.Map;
 public interface SystemRoleMenuMapper extends BaseMapper {
 
     List<Map> getMenuListByRoleIds(Map params);
+
+    /**
+     * 删除角色关联的菜单
+     * @param roleId
+     * @return
+     */
+    int deleteByRoleId(Integer roleId);
+
+    /**
+     * 批量删除角色关联的菜单
+     * @param roleIds
+     * @return
+     */
+    int deleteByRoleIds(List<Integer> roleIds);
 }

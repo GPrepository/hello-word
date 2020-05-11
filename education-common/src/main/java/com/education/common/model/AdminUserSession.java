@@ -1,6 +1,7 @@
 package com.education.common.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +63,7 @@ public class AdminUserSession implements Serializable {
         this.sessionId = sessionId;
     }
 
-    private Set<String> permissionList; // 用户权限标识
+    private Set<String> permissionList = new HashSet<>(); // 用户权限标识
     private String sessionId;
 
     public AdminUserSession(Map userMap) {

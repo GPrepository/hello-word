@@ -20,4 +20,12 @@
             #{value}
         </foreach>
     </insert>
+
+    <update id="update" parameterType="map">
+        update system_admin
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
 </mapper>

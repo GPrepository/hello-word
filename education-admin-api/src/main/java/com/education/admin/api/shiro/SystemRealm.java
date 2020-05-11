@@ -2,6 +2,7 @@ package com.education.admin.api.shiro;
 
 import com.education.common.exception.BusinessException;
 import com.education.common.model.AdminUserSession;
+import com.education.common.utils.EncryptUtil;
 import com.education.common.utils.ObjectUtils;
 import com.education.common.utils.ResultCode;
 import com.education.common.utils.SpringBeanManager;
@@ -48,10 +49,13 @@ public class SystemRealm extends AuthorizingRealm {
         // 判断用户是否存在
         if (ObjectUtils.isEmpty(userInfoMap)) {
             throw new UnknownAccountException("用户不存在");
-        } else if (!(boolean)userInfoMap.get("disabled_flag")) {
+        } else if ((boolean)userInfoMap.get("disabled_flag")) {
             throw new BusinessException("账号已禁用");
         }
 
+        String password = EncryptUtil.getMd5(new String(usernamePasswordToken.getPassword()),
+                (String) userInfoMap.get("encrypt"));
+        usernamePasswordToken.setPassword(password.toCharArray());
         //以下数据属于数据库中的用户名密
         return new SimpleAuthenticationInfo(new AdminUserSession(userInfoMap),
                 userInfoMap.get("password"), getName());
