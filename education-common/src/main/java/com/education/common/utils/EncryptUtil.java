@@ -6,6 +6,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 import java.io.UnsupportedEncodingException;
 import java.security.*;
+import java.util.UUID;
 
 
 /**
@@ -25,6 +26,10 @@ public class EncryptUtil {
 	public static String getMd5(String Md5key, String salt) {
 		String key = DigestUtils.md5Hex(Md5key) + "&" + salt;
 		return DigestUtils.md5Hex(key);
+	}
+
+	public static String generatorKey(){
+		return getMd5(UUID.randomUUID().toString());
 	}
 
 	/**

@@ -1,17 +1,26 @@
 package com.education.service;
 
+import com.alibaba.fastjson.util.TypeUtils;
 import com.education.common.model.AdminUserSession;
 import com.education.common.utils.ObjectUtils;
 import com.education.common.utils.Result;
 import com.education.common.utils.ResultCode;
+import com.education.common.utils.SpringBeanManager;
 import com.education.mapper.BaseMapper;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import org.apache.ibatis.session.RowBounds;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,9 +31,46 @@ import java.util.Map;
  */
 public abstract class BaseService<M extends BaseMapper> {
 
+    private static final String DEFAULT_PAGE_METHOD = "queryList";
     @Autowired
     protected M mapper;
     protected static final Logger logger = LoggerFactory.getLogger(BaseService.class);
+
+    public Result pagination(Map params, Class<? extends BaseMapper> mapperClass, String methodName) {
+       try {
+           Integer offset = RowBounds.NO_ROW_OFFSET;
+           Integer limit = RowBounds.NO_ROW_LIMIT;
+           if (ObjectUtils.isNotEmpty(params.get("offset"))) {
+               offset = Integer.parseInt((String) params.get("offset"));
+           }
+
+           if (ObjectUtils.isNotEmpty(params.get("limit"))) {
+               limit = Integer.parseInt((String) params.get("limit"));
+           }
+
+           Page page = PageHelper.offsetPage(offset, limit);
+
+           Object pageResult = null;
+           if (ObjectUtils.isNotEmpty(mapperClass)) {
+              Method method = mapperClass.getMethod(methodName, Map.class);
+              BaseMapper mapperBean = SpringBeanManager.getBean(mapperClass);
+              method.invoke(mapperBean, params);
+           } else {
+               pageResult = mapper.queryList(params);
+           }
+           Map resultMap = new HashMap<>();
+           resultMap.put("total", page.getTotal()); // 总条数
+           resultMap.put("dataList", pageResult);
+           return Result.success(resultMap);
+       } catch (Exception e) {
+           logger.error("分页异常", e);
+       }
+       return Result.fail();
+    }
+
+    public Result pagination(Map params) {
+       return pagination(params, null, DEFAULT_PAGE_METHOD);
+    }
 
     /**
      * 添加或修改
@@ -44,11 +90,26 @@ public abstract class BaseService<M extends BaseMapper> {
                 this.save(modelBeanMap);
                 message = "添加";
             }
-            return Result.success(ResultCode.SUCCESS, message + "成功"); //new ResultCode(ResultCode.SUCCESS, message + "成功");
+            return Result.success(ResultCode.SUCCESS, message + "成功");
         } catch (Exception e) {
             logger.error("操作异常", e);
         }
         return Result.success(ResultCode.FAIL, "操作异常");
+    }
+
+
+    /**
+     * 添加或修改数据
+     * @param params
+     * @return
+     */
+    public Result saveOrUpdate(Map params) {
+        Integer id = (Integer) params.get("id");
+        boolean updateFlag = false;
+        if (ObjectUtils.isNotEmpty(id)) {
+            updateFlag = true;
+        }
+        return this.saveOrUpdate(updateFlag, params);
     }
 
     /**
@@ -68,7 +129,15 @@ public abstract class BaseService<M extends BaseMapper> {
      * @return
      */
     public int save(Map modelMap) {
-        return mapper.save(modelMap);
+        Map params = new HashMap();
+        params.put("params", modelMap);
+        Integer result = mapper.save(params);
+        Object id = params.get("id");
+        // 如果主键id不为空的话，直接返回主键id
+        if (ObjectUtils.isNotEmpty(id)) {
+            return TypeUtils.castToInt(id);
+        }
+        return result;
     }
 
     /**

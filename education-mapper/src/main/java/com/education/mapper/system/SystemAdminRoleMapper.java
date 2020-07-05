@@ -22,4 +22,11 @@ public interface SystemAdminRoleMapper extends BaseMapper {
      * @return
      */
     int deleteByRoleIds(List<Integer> roleIds);
+
+    /**
+     * 根据管理员id删除信息
+     * @param adminId
+     * @return
+     */
+    int deleteByAdminId(Integer adminId);
 }

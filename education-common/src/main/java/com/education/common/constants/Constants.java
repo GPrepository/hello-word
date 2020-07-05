@@ -11,4 +11,6 @@ public final class Constants {
     public static final String IMAGE_CODE = "image_code";
 
     public static int FIVE_DAY_TIME_OUT = 5 * 24 * 60 * 60 * 1000;
+
+    public static final String JSON_CONTENT_TYPE = "application/json";
 }

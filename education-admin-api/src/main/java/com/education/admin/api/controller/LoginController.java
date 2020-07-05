@@ -7,14 +7,16 @@ import com.education.common.constants.Constants;
 import com.education.common.model.AdminUserSession;
 import com.education.common.model.JwtToken;
 import com.education.common.utils.IpUtils;
-import com.education.common.utils.RegexUtils;
 import com.education.common.utils.Result;
 import com.education.common.utils.ResultCode;
 import com.education.service.system.SystemAdminService;
 import com.education.service.task.LoginSuccessListener;
 import com.education.service.task.TaskManager;
 import com.education.service.task.TaskParam;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +42,12 @@ public class LoginController extends BaseController {
     @Autowired
     private TaskManager taskManager;
 
+    /**
+     * 管理员登录
+     * @param request
+     * @param params
+     * @return
+     */
     @PostMapping("login")
     @ParamsValidate(params = {
         @Param(name = "userName", message = "请输入用户名"),
@@ -52,7 +60,8 @@ public class LoginController extends BaseController {
         String password = (String)params.get("password");
         String imageCode = (String)params.get("imageCode");
         String key = String.valueOf(params.get("key"));
-        String cacheCode = (String) redisTemplate.opsForValue().get(key);
+
+        String cacheCode = (String) redisTemplate.opsForValue().get(key);;
         if (!imageCode.equalsIgnoreCase(cacheCode)) {
             return Result.fail(ResultCode.FAIL, "验证码错误");
         }
@@ -85,5 +94,21 @@ public class LoginController extends BaseController {
             result.setData(params);
         }
         return result;
+    }
+
+    /**
+     * 用户退出
+     * @return
+     */
+    @PostMapping("/logout")
+    public Result logout() {
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        return Result.success(ResultCode.SUCCESS, "退出成功");
+    }
+
+    @GetMapping("unAuth")
+    public Result unAuth() {
+        return Result.fail(ResultCode.NOT_AUTH, "用户未认证");
     }
 }

@@ -14,6 +14,8 @@ public interface SystemRoleMenuMapper extends BaseMapper {
 
     List<Map> getMenuListByRoleIds(Map params);
 
+    int deleteRoleMenuByRoleId(Integer roleId);
+
     /**
      * 删除角色关联的菜单
      * @param roleId

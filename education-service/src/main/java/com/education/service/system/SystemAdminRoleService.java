@@ -26,4 +26,13 @@ public class SystemAdminRoleService extends BaseService<SystemAdminRoleMapper> {
     public int deleteByRoleIds(List<Integer> roleIds) {
         return mapper.deleteByRoleIds(roleIds);
     }
+
+
+    public int deleteByAdminId(Integer adminId) {
+        return mapper.deleteByAdminId(adminId);
+    }
+
+    public int batchSave(Map params) {
+        return mapper.batchSave(params);
+    }
 }

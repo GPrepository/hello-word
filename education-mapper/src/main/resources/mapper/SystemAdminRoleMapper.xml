@@ -16,4 +16,16 @@
          #{id}
       </foreach>
    </delete>
+
+
+   <delete id="deleteByAdminId" parameterType="Integer">
+      delete from system_admin_role where admin_id = #{adminId}
+   </delete>
+
+   <insert id="batchSave" parameterType="map">
+      insert into system_admin_role(role_id, admin_id) values
+      <foreach collection="list" separator="," item="item">
+         (#{item.role_id}, #{item.admin_id})
+      </foreach>
+   </insert>
 </mapper>

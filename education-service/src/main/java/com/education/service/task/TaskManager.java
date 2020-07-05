@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TaskManager {
 
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    private final Map<String, TaskListener> taskListenerMap = new ConcurrentHashMap<>();
+  //  private final Map<String, TaskListener> taskListenerMap = new ConcurrentHashMap<>();
 
     public TaskManager(ThreadPoolTaskExecutor threadPoolTaskExecutor) {
         this.threadPoolTaskExecutor = threadPoolTaskExecutor;

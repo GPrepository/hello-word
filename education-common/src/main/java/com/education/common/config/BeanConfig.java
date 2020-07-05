@@ -1,5 +1,7 @@
 package com.education.common.config;
 
+import com.education.common.cache.CacheBean;
+import com.education.common.cache.RedisCacheBean;
 import com.education.common.model.JwtToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,5 +37,10 @@ public class BeanConfig {
         redisTemplate.setHashValueSerializer(redisSerializer);//Hash value序列化
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+
+    @Bean
+    public CacheBean redisCacheBean(RedisTemplate redisTemplate) {
+        return new RedisCacheBean(redisTemplate);
     }
 }

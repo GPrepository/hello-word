@@ -8,10 +8,16 @@
 
     <select id="queryList" resultType="map">
         select * from system_admin
+        <where>
+            <if test="keyWord != null and keyWord != ''">
+               <bind name="value" value="'%' + keyWord + '%'"/>
+                and (login_name like #{value} or name like #{value})
+            </if>
+        </where>
     </select>
 
-    <insert id="save" parameterType="map">
-        insert into system_admin_role
+    <insert id="save" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into system_admin
         <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
             ${key}
         </foreach>
@@ -28,4 +34,8 @@
         </foreach>
         where id = #{params.id}
     </update>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete from system_admin where id = #{id}
+    </delete>
 </mapper>

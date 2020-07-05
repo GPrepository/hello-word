@@ -10,6 +10,8 @@ public class ResultCode {
 
     public static final int SUCCESS = 1; //响应成功状态码
     public static final int FAIL = 0; //响应失败状态码
+    public static final int NOT_AUTH = 1001; //用户未认证
+    public static final int NO_URL_PERMISSION = 1002; // url无权限访问状态码
     public static final String DEFAULT_SUCCESS_MESSAGE = "操作成功";
     public static final String DEFAULT_FAIL_MESSAGE = "系统异常";
 

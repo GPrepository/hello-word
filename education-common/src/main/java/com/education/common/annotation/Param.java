@@ -15,7 +15,7 @@ public @interface Param {
 
     int errorCode() default 0;
     String name(); //需要校验字段名称
-    String message();
+    String message() default "";
 
     String regexp() default ""; // 正则表达式校验
     String regexpMessage() default ""; // 正则校验失败提示

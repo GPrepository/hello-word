@@ -16,7 +16,7 @@
         select * from system_role where name = #{name}limit 1
     </select>
 
-    <insert id="save" parameterType="map">
+    <insert id="save" parameterType="map"  keyColumn="id" keyProperty="id" useGeneratedKeys="true">
         insert into system_role
         <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
             ${key}

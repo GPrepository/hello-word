@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,5 +74,38 @@ public class SystemRoleService extends BaseService<SystemRoleMapper> {
             logger.error("批量删除角色异常", e);
             throw new BusinessException(new ResultCode(ResultCode.FAIL, "批量删除角色异常"));
         }
+    }
+
+    /**
+     * 保存角色权限
+     * @param params
+     * @return
+     */
+    @Transactional
+    public Result saveRolePermission(Map params) {
+
+        try {
+            Integer roleId = (Integer) params.get("roleId");
+            //删除角色原有的权限
+            systemRoleMenuService.deleteRoleMenuByRoleId(roleId);
+            //获取权限集合
+            List<Integer> permission = (List<Integer>) params.get("permission");
+            if (ObjectUtils.isNotEmpty(permission)) {
+                List<Map> list = new ArrayList<>();
+
+                permission.forEach(item -> {
+                    Map roleMenuMap = new HashMap<>();
+                    roleMenuMap.put("menu_id", item);
+                    roleMenuMap.put("role_id", roleId);
+                    list.add(roleMenuMap);
+                });
+                systemRoleMenuService.batchSaveRoleMenu(list);
+            }
+            return Result.success(ResultCode.SUCCESS, "保存角色权限成功");
+        } catch (Exception e) {
+            logger.error("保存角色权限异常", e);
+            throw new BusinessException(new ResultCode(ResultCode.FAIL, "保存角色权限异常"));
+        }
+
     }
 }

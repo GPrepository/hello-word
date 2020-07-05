@@ -4,6 +4,7 @@ import com.education.mapper.system.SystemRoleMenuMapper;
 import com.education.service.BaseService;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,21 @@ public class SystemRoleMenuService extends BaseService<SystemRoleMenuMapper> {
 
     public List<Map> getMenuListByRoleIds(Map params) {
         return mapper.getMenuListByRoleIds(params);
+    }
+
+    /**
+     * 根据角色id删除角色权限
+     * @param roleId
+     * @return
+     */
+    public int deleteRoleMenuByRoleId(Integer roleId) {
+        return mapper.deleteRoleMenuByRoleId(roleId);
+    }
+
+    public int batchSaveRoleMenu(List<Map> roleMenuList) {
+        Map params = new HashMap<>();
+        params.put("list", roleMenuList);
+        return mapper.batchSave(params);
     }
 
 

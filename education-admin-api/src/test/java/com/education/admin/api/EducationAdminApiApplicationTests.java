@@ -2,6 +2,8 @@ package com.education.admin.api;
 
 import com.education.mapper.system.SystemAdminMapper;
 import com.education.mapper.system.SystemRoleMapper;
+import com.education.service.system.SystemAdminService;
+import com.jfinal.kit.HttpKit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +18,31 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 public class EducationAdminApiApplicationTests {
 
-    @Autowired
-    private SystemAdminMapper systemAdminMapper;
 
     @Autowired
-    private SystemRoleMapper systemRoleMapper;
+    private SystemAdminService systemAdminService;
+    @Autowired
+    private SystemAdminMapper systemAdminMapper;
 
     @Autowired
     private RedisTemplate redisTemplate;
 
     @Test
     public void testCache() {
+        Map params = new HashMap<>();
+        params.put("login_name", "testsfs");
+        params.put("password", "123456");
+        params.put("encrypt", "123456000");
+        int result = systemAdminService.save(params);
+        System.err.println(params);
        // redisTemplate.opsForValue().set("test", new LoginController(new SystemAdminService()));
       //  System.out.println(redisTemplate.opsForValue().get("test"));
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 5; i++) {
+            HttpKit.get("http://localhost/image?key=test");
+        }
     }
 
     @Test
@@ -46,6 +60,6 @@ public class EducationAdminApiApplicationTests {
     public void saveRole() {
         Map params = new HashMap<>();
         params.put("name", "test");
-        systemRoleMapper.save(params);
+      //  systemRoleMapper.save(params);
     }
 }

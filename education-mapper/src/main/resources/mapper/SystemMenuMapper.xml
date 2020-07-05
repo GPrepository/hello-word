@@ -3,6 +3,31 @@
 <mapper namespace="com.education.mapper.system.SystemMenuMapper">
 
     <select id="queryList" resultType="map">
-        select * from system_menu order by sort desc
+        select a.*, b.name parent_name from system_menu a left join (select name, id from system_menu) b
+         on a.parent_id = b.id
+         order by sort desc
     </select>
+
+    <select id="findById" resultType="map">
+        select * from system_menu where id = #{id}
+    </select>
+    <insert id="save" parameterType="map">
+        insert into system_menu
+        <foreach collection="params.keys" item="key" open="(" close=")" separator="," >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="params.values"  item="value" open="(" close=")" separator=",">
+            #{value}
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="map">
+        update system_menu
+        <foreach collection="params.keys" item="key" open="set" separator="," >
+            ${key} = #{params[${key}]}
+        </foreach>
+        where id = #{params.id}
+    </update>
+
 </mapper>

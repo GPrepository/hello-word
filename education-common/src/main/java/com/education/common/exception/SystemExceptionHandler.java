@@ -3,6 +3,7 @@ package com.education.common.exception;
 
 import com.education.common.utils.Result;
 import com.education.common.utils.ResultCode;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -30,6 +31,10 @@ public class SystemExceptionHandler {
                 result.setCode(businessException.getResultCode().getCode());
                 result.setMessage(businessException.getResultCode().getMessage());
             }
+            // 无权访问时shiro抛出的异常
+        } else if (e instanceof UnauthorizedException) {
+            result.setCode(ResultCode.NO_URL_PERMISSION);
+            result.setMessage("权限不足, 无法访问");
         }
         logger.error("系统异常", e);
         return result;

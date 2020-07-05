@@ -1,5 +1,6 @@
 package com.education.admin.api.controller;
 
+import com.education.common.annotation.SystemLog;
 import com.education.common.base.BaseController;
 import com.education.common.model.Captcha;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ public class ImageController extends BaseController {
      * @param response
      */
     @GetMapping("/image")
+    @SystemLog(describe = "生成验证码")
     public void image(HttpServletRequest request, HttpServletResponse response) {
         String key = request.getParameter("key");
         Captcha captcha = new Captcha(redisTemplate, key);

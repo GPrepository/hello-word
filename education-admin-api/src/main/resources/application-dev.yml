@@ -16,9 +16,19 @@ spring:
       # 此属性控制池中连接的最长生命周期，值0表示无限生命周期
       max-lifetime: 6000
   redis:
-    password: 123456
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: 30
+        max-idle: 8
+        min-idle: 0
     host: 127.0.0.1
-    port: 6379
+    password: 123456
+pagehelper:
+  helper-dialect: mysql #数据库方言，默认为mysql
+  reasonable: true   #是否开启分页合理化
+  support-methods-arguments: true #支持通过 Mapper 接口参数来传递分页参数
+  params: count=countSql
 mybatis:
   mapper-locations: mapper/*.xml
   configuration:

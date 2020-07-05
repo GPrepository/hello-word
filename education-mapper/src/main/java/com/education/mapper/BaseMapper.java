@@ -12,12 +12,15 @@ import java.util.Map;
  */
 public interface BaseMapper {
 
+
+    Map findById(Integer id);
+
     /**
      * 添加单条数据
      * @param params
      * @return
      */
-    int save(@Param("params") Map params);
+    int save(Map params);
 
     /**
      * 修改数据
