@@ -27,8 +27,8 @@ import java.util.Map;
  * @version 1.0
  * @create_at 2020/6/21 16:16
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class LogAspect {
 
     @Autowired

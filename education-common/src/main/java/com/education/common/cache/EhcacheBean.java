@@ -5,7 +5,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +19,8 @@ public class EhcacheBean implements CacheBean {
 
     private static final String DEFAULT_CACHE = "default_cache";
     private final CacheManager cacheManager;
+    private static final Logger logger = LoggerFactory.getLogger(EhcacheBean.class);
     private final Object rock = new Object();
-    private final Logger logger = LoggerFactory.getLogger(EhcacheBean.class);
 
     public EhcacheBean() {
         InputStream inputStream = this.getClass()

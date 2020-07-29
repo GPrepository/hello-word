@@ -4,6 +4,7 @@ import com.education.common.cache.CacheBean;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -24,8 +25,8 @@ import java.util.Map;
  * @version 1.0
  * @create_at 2020/4/22 11:00
  */
-@Configuration
-@AutoConfigureAfter(ShiroLifecycleBeanPostProcessorConfig.class)
+//@Configuration
+//@AutoConfigureAfter(ShiroLifecycleBeanPostProcessorConfig.class)
 public class ShiroBeanConfig {
 
     private static final long INVALID_TIME = 3600 * 6 * 1000;
@@ -40,6 +41,7 @@ public class ShiroBeanConfig {
         filterChainDefinitionMap.put("/system/**", "authc");
         filterChainDefinitionMap.put("/login", "anon");
         filterChainDefinitionMap.put("/image", "anon");
+        filterChainDefinitionMap.put("/uploads/**", "anon");
         filterChainDefinitionMap.put("/logout", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         shiroFilterFactoryBean.setFilters(shiroFilterFactoryBean.getFilters());
@@ -47,23 +49,21 @@ public class ShiroBeanConfig {
     }
 
     @Bean
-    public DefaultWebSessionManager sessionManager(SessionDAO educationShiroSession) {
-        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
-        // 设置session过期时间6个小时
+    public SessionManager sessionManager(SessionDAO distributeShiroSession) {
+        DefaultSessionManager sessionManager = new DefaultWebSessionManager();
+        // 设置session
         sessionManager.setGlobalSessionTimeout(INVALID_TIME);
-        sessionManager.setSessionDAO(educationShiroSession);
+        sessionManager.setSessionDAO(distributeShiroSession);
         return sessionManager;
     }
 
-
     @Bean
-    public SecurityManager securityManager(SessionManager sessionManager,
-                                           Realm systemRealm,
-                                          CacheManager redisCacheManager) {
+    public SecurityManager securityManager(SessionManager sessionManager, Realm systemRealm,
+                                           CacheManager redisCacheManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(systemRealm);
-        securityManager.setSessionManager(sessionManager);
         securityManager.setCacheManager(redisCacheManager);
+        securityManager.setSessionManager(sessionManager);
         return securityManager;
     }
 
@@ -76,6 +76,7 @@ public class ShiroBeanConfig {
     public RedisCacheManager redisCacheManager(CacheBean redisCacheBean) {
         return new RedisCacheManager(redisCacheBean);
     }
+
 
 
     /**

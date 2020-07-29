@@ -29,6 +29,12 @@ pagehelper:
   reasonable: true   #是否开启分页合理化
   support-methods-arguments: true #支持通过 Mapper 接口参数来传递分页参数
   params: count=countSql
+file:
+  upload: F:\\static\\ # 配置文件上传的根目录
+ueditor:
+  configFileName: config-dev.json
+lbs:
+  key: MYOBZ-OOEW3-KYC3G-YWDXA-DMQJ6-SPBMH
 mybatis:
   mapper-locations: mapper/*.xml
   configuration:

@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class Captcha {
 
-	private RedisTemplate redisTemplate;
+	private CacheBean redisCacheBean;
 	private String key;
 
-	public Captcha(RedisTemplate redisTemplate, String key) {
-		this.redisTemplate = redisTemplate;
+	public Captcha(CacheBean redisCacheBean, String key) {
+		this.redisCacheBean = redisCacheBean;
 		this.key = key;
 	}
 
@@ -50,7 +50,8 @@ public class Captcha {
 		setBorder(graphics);
 		setRandomLine(graphics);
 		String num = serRandomNum(graphics);
-		redisTemplate.opsForValue().set(this.key, num, 60, TimeUnit.SECONDS);
+		redisCacheBean.put(this.key, num, 60, TimeUnit.SECONDS);
+		// redisTemplate.opsForValue().set(this.key, num, 60, TimeUnit.SECONDS);
 		response.setHeader("Pragma","no-cache");
 		response.setHeader("Cache-Control","no-cache");
 		response.setDateHeader("Expires", 0);

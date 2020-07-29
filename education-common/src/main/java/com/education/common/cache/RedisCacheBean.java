@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
  * @create_at 2019/12/23 21:43
  */
 public class RedisCacheBean implements CacheBean {
-
     private final RedisTemplate redisTemplate;
     private final ValueOperations valueOperations;
 
@@ -44,7 +43,7 @@ public class RedisCacheBean implements CacheBean {
     }
 
     private String createNewKey(String cacheName, Object key) {
-       return String.format("%s:%s", cacheName, key);
+        return String.format("%s:%s", cacheName, key);
     }
 
     @Override

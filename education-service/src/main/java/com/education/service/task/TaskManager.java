@@ -29,4 +29,8 @@ public class TaskManager {
         }
     }
 
+    public void pushTask(Runnable task) {
+        threadPoolTaskExecutor.execute(task);
+    }
+
 }

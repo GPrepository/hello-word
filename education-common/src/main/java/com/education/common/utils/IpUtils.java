@@ -5,7 +5,8 @@ import com.jfinal.kit.HttpKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
-
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class IpUtils {
@@ -60,5 +61,36 @@ public class IpUtils {
 			logger.error("获取ip地址异常", e);
 		}
 		return null;
+	}
+
+	private static final String IP_URL = "https://apis.map.qq.com/ws/location/v1/ip";
+
+    public static final String LBS_KEY = "MYOBZ-OOEW3-KYC3G-YWDXA-DMQJ6-SPBMH";
+	public static String getAddressByIp(String ip) {
+		Map params = new HashMap<>();
+		params.put("ip", ip);
+		params.put("key", LBS_KEY);
+		try {
+			String content = HttpKit.get(IP_URL, params);
+			JSONObject jsonObject = JSONObject.parseObject(content);
+			Integer status = jsonObject.getInteger("status");
+			System.out.println(status);
+			if (status == 0) { // 表示接口请求成功
+
+				JSONObject result = (JSONObject) jsonObject.get("result");
+				Map adInfo = (Map) result.get("ad_info");
+				String nation = (String) adInfo.get("nation");
+				if ("中国".equals(nation)) {
+					nation = "";
+				}
+				String province = (String) adInfo.get("province"); // 获取省份
+				String city = (String) adInfo.get("city");
+				return nation + province + city;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+
 	}
 }

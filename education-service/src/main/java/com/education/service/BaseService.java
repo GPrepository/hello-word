@@ -7,11 +7,14 @@ import com.education.common.utils.Result;
 import com.education.common.utils.ResultCode;
 import com.education.common.utils.SpringBeanManager;
 import com.education.mapper.BaseMapper;
+import com.education.service.task.TaskManager;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Hash;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,9 @@ public abstract class BaseService<M extends BaseMapper> {
     private static final String DEFAULT_PAGE_METHOD = "queryList";
     @Autowired
     protected M mapper;
+    @Autowired
+    protected TaskManager taskManager;
+
     protected static final Logger logger = LoggerFactory.getLogger(BaseService.class);
 
     public Result pagination(Map params, Class<? extends BaseMapper> mapperClass, String methodName) {
@@ -66,6 +72,21 @@ public abstract class BaseService<M extends BaseMapper> {
            logger.error("分页异常", e);
        }
        return Result.fail();
+    }
+
+    /**
+     * 更新shiro 缓存中的用户信息，避免由于redis 缓存导致获取用户信息不一致问题
+     * @param adminUserSession
+     */
+    public void updateShiroCacheUserInfo(AdminUserSession adminUserSession) {
+        Subject subject = SecurityUtils.getSubject();
+        PrincipalCollection principals = subject.getPrincipals();
+        //realName认证信息的key，对应的value就是认证的user对象
+        String realName = principals.getRealmNames().iterator().next();
+        //创建一个PrincipalCollection对象
+        PrincipalCollection newPrincipalCollection = new SimplePrincipalCollection(adminUserSession, realName);
+        // 调用subject的runAs方法，把新的PrincipalCollection放到session里面
+        subject.runAs(newPrincipalCollection);
     }
 
     public Result pagination(Map params) {

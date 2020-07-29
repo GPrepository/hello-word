@@ -6,6 +6,8 @@ import com.education.common.base.BaseController;
 import com.education.common.constants.Constants;
 import com.education.common.model.AdminUserSession;
 import com.education.common.model.JwtToken;
+import com.education.common.model.OnlineUser;
+import com.education.common.model.OnlineUserManager;
 import com.education.common.utils.IpUtils;
 import com.education.common.utils.Result;
 import com.education.common.utils.ResultCode;
@@ -13,6 +15,7 @@ import com.education.service.system.SystemAdminService;
 import com.education.service.task.LoginSuccessListener;
 import com.education.service.task.TaskManager;
 import com.education.service.task.TaskParam;
+import com.education.service.websocket.SystemWebSocketHandler;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,11 @@ public class LoginController extends BaseController {
     private JwtToken jwtToken;
     @Autowired
     private TaskManager taskManager;
+    @Autowired
+    private OnlineUserManager onlineUserManager;
 
+    @Autowired
+    private SystemWebSocketHandler systemWebSocketHandler;
     /**
      * 管理员登录
      * @param request
@@ -60,18 +67,23 @@ public class LoginController extends BaseController {
         String password = (String)params.get("password");
         String imageCode = (String)params.get("imageCode");
         String key = String.valueOf(params.get("key"));
-
-        String cacheCode = (String) redisTemplate.opsForValue().get(key);;
+        String cacheCode = redisCacheBean.get(key);
         if (!imageCode.equalsIgnoreCase(cacheCode)) {
             return Result.fail(ResultCode.FAIL, "验证码错误");
         }
         Result result = systemAdminService.login(userName, password);
         if (result.isSuccess()) {
+
             // 加载用户菜单及其权限标识
             AdminUserSession adminUserSession = systemAdminService.getAdminUserSession();
+            Integer userId = (Integer) adminUserSession.getUserMap().get("id");
+            systemAdminService.checkOnlineUser(userId); // 校验用户是否已登录
+            // 将目前的登录得用户添加到用户容器
+            String sessionId = request.getSession().getId();
+            OnlineUser onlineUser = new OnlineUser(sessionId, adminUserSession);
+            onlineUserManager.addOnlineUser(userId, onlineUser);// 将显著登录的用户添加的用户容器
             systemAdminService.loadUserMenuAndPermission(adminUserSession);
             params.clear();
-
             // 创建一个token
             String token = jwtToken.createToken(adminUserSession.getUserMap().get("id"), Constants.FIVE_DAY_TIME_OUT);
             params.put("token", token);
@@ -101,9 +113,15 @@ public class LoginController extends BaseController {
      * @return
      */
     @PostMapping("/logout")
-    public Result logout() {
+    public Result logout(HttpServletRequest request) {
+        String sessionId = request.getSession().getId();
+        systemWebSocketHandler.clearWebSocketSession(sessionId);
+
+        Integer userId = (Integer) systemAdminService.getAdminUser().get("id");
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
+        // 清除在线用户
+        onlineUserManager.removeOnlineUser(userId);
         return Result.success(ResultCode.SUCCESS, "退出成功");
     }
 

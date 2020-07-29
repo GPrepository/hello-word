@@ -1,15 +1,17 @@
 package com.education.service.system;
 
+import com.alibaba.fastjson.JSONObject;
 import com.education.common.exception.BusinessException;
 import com.education.common.model.AdminUserSession;
+import com.education.common.model.OnlineUser;
+import com.education.common.model.OnlineUserManager;
 import com.education.common.utils.*;
 import com.education.mapper.system.SystemAdminMapper;
 import com.education.service.BaseService;
+import com.education.service.websocket.SystemWebSocketHandler;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +41,44 @@ public class SystemAdminService extends BaseService<SystemAdminMapper> {
     private SystemAdminRoleService systemAdminRoleService;
     @Autowired
     private SystemRoleMenuService systemRoleMenuService;
+    @Resource
+    private OnlineUserManager onlineUserManager;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
+    private SystemWebSocketHandler systemWebSocketHandler;
+    /**
+     * 第一 去用户容器中查找这个用户是否在设备上已经登录
+     * 如果已经登录的话， 使用websocket 异步发送一条消息推送
+     * @param userId
+     */
+    public void checkOnlineUser(Integer userId) {
+        OnlineUser onlineUser = onlineUserManager.getOnlineUser(userId);
+        if (ObjectUtils.isNotEmpty(onlineUser)) { //代表已经在其他设备登录
+            // 需要使用webSocket发送一条消息推送
+            String sessionId = onlineUser.getSessionId(); // 获取已经登录的设备会话id
+
+            onlineUserManager.removeOnlineUser(userId); // 踢出原来的用户信息
+            String ip = IpUtils.getAddressIp(request);
+            taskManager.pushTask(() -> {
+                try {
+                    // Thread.sleep(10000);
+                    Thread.sleep(1000);
+                    String address = IpUtils.getAddressByIp(ip);
+                    address = address == null ? "在其它设备上" : address;
+                    ResultCode resultCode = new ResultCode(ResultCode.SUCCESS, "您的账号已在" + address + "登录，5秒后将自动下线，如非本人操作，请立即修改密码");
+                    String message = JSONObject.toJSONString(resultCode);
+                    systemWebSocketHandler.sendMessage(sessionId, message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+
+        }
+    }
+
 
 
     /**
@@ -120,6 +162,7 @@ public class SystemAdminService extends BaseService<SystemAdminMapper> {
 
         List<Map> treeMenuList = MapTreeUtils.buildTreeData(menuList);
         adminUserSession.setMenuList(treeMenuList);
+        this.updateShiroCacheUserInfo(adminUserSession);
     }
 
     @Override

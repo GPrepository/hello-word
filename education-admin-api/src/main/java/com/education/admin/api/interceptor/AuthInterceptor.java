@@ -33,6 +33,8 @@ public class AuthInterceptor extends BaseInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object handler) throws Exception {
+        String target = getRequestUrl(request);
+        System.out.println(target);
         String token = request.getHeader("token");
         String userId = jwtToken.parserToken(token, String.class);
         // token 不存在或者token 已失效

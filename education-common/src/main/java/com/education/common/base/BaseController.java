@@ -12,7 +12,9 @@ import org.springframework.data.redis.core.RedisTemplate;
  */
 public abstract class BaseController {
 
+  //  @Autowired
+   // protected RedisTemplate redisTemplate;
     @Autowired
-    protected RedisTemplate redisTemplate;
+    protected CacheBean redisCacheBean;
 
 }
