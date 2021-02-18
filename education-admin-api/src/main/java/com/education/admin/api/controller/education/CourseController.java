@@ -24,6 +24,8 @@ public class CourseController extends BaseController {
     @Autowired
     private CourseService courseService;
 
+
+
     /**
      * 课程列表
      * @param params
